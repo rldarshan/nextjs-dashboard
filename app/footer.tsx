@@ -12,7 +12,7 @@ const Footer = () => {
   return (
     <>
         <style>
-            {`
+            {` 
                 footer {
                     position: absolute;
                     width: 100%;
