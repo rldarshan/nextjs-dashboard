@@ -1,0 +1,15 @@
+/* styles.css */
+body {
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+}
+
+@media (min-width: 992px) {
+  .collapse .collapse-content {
+    display: flex;
+    width: 100%;
+  }
+
+  .collapse .ripple {
+    height: 35px;
+  }
+}
