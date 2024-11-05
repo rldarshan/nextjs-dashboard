@@ -23,11 +23,11 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import * as XLSX from 'xlsx';
-import { openDB, IDBPDatabase } from 'idb'
 import { DataGrid, GridToolbar, GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { saveFormData, getAllFormData, deleteFormData } from './indexedDB';
 
-interface FormState {
+export type FormState = {
   id: number;
   name: string;
   email: string;
@@ -133,45 +133,6 @@ export default function FormComponent() {
   const handleChange = (field: keyof FormState, value: any) => {
     setFormState((prev) => ({ ...prev, [field]: value }));
   };
-
-  let db: IDBPDatabase | null = null;
-
-  async function initDB() {
-    db = await openDB('FormDataDB', 1, {
-      upgrade(database) {
-        if (!database.objectStoreNames.contains('formData')) {
-          database.createObjectStore('formData', { keyPath: 'id', autoIncrement: true });
-        }
-      }
-    });
-  }
-  
-  async function saveFormData(data: FormState) {
-    if (!db) await initDB();
-    const tx = db!.transaction('formData', 'readwrite');
-    const store = tx.objectStore('formData');
-    await store.put(data);
-    await tx.done;
-  }
-  
-  async function getAllFormData() {
-    if (!db) await initDB();
-    const tx = db!.transaction('formData', 'readonly');
-    const store = tx.objectStore('formData');
-    const data = await store.getAll();
-    await tx.done;
-    return data;
-  }
-
-  async function deleteFormData(ids: number[]) {
-    if (!db) await initDB();
-    const tx = db!.transaction('formData', 'readwrite');
-    const store = tx.objectStore('formData');
-    for (const id of ids) {
-      await store.delete(id);
-    }
-    await tx.done;
-  }
 
   useEffect(() => {
     // Load data from IndexedDB on component mount
