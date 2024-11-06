@@ -38,6 +38,7 @@ export type FormState = {
   gender: string;
   vegetarian: boolean;
   salary: number;
+  file: Blob | null;
 }
 
 export default function FormComponent() {
@@ -52,6 +53,7 @@ export default function FormComponent() {
     gender: "",
     vegetarian: false,
     salary: 1000,
+    file: null
   });
   const [errors, setErrors] = useState<{ [key in keyof FormState]?: string }>({});
   const [rows, setRows] = useState<FormState[]>([]);
@@ -185,6 +187,7 @@ export default function FormComponent() {
         gender: '',
         vegetarian: false,
         salary: 1000,
+        file: null
       });
 
 

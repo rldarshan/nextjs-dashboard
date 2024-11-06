@@ -43,16 +43,22 @@ export default function Header() {
 
           <MDBCollapse navbar open={openBasic} className="d-flex">
             <MDBNavbarNav className="my-2, my-lg-0, me-sm-0, my-sm-0">
+              
               <MDBNavbarItem>
                 <MDBNavbarLink aria-current="page" href="/">
                   Home
                 </MDBNavbarLink>
               </MDBNavbarItem>
+
               <MDBNavbarItem>
                 <MDBNavbarLink href="/about">About</MDBNavbarLink>
               </MDBNavbarItem>
 
               <MDBNavbarItem>
+                <MDBNavbarLink href="/dashboard">Dashboard</MDBNavbarLink>
+              </MDBNavbarItem>
+
+              {/* <MDBNavbarItem>
                 <MDBDropdown>
                   <MDBDropdownToggle tag="a" className="nav-link" role="button">
                         Dashboard
@@ -63,7 +69,7 @@ export default function Header() {
                     <MDBDropdownItem link>Something else here</MDBDropdownItem>
                   </MDBDropdownMenu>
                 </MDBDropdown>
-              </MDBNavbarItem>
+              </MDBNavbarItem> */}
 
               <MDBNavbarItem>
                 <MDBNavbarLink href="country_list"> Country Table </MDBNavbarLink>
