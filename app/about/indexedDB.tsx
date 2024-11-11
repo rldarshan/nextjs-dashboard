@@ -30,6 +30,18 @@ export async function getAllFormData() {
   return data;
 }
 
+// export async function getFileData(id:number) {
+//   const tx = db!.transaction('formData', 'readonly');
+//   const store = tx.objectStore('formData');
+//   const data = await store.get(id);
+//   await tx.done;
+//   return data.file;
+// }
+
+export function getDB(){
+  return db
+}
+
 export async function deleteFormData(ids: number[]) {
   if (!db) await initDB();
   const tx = db!.transaction('formData', 'readwrite');

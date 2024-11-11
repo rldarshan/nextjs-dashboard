@@ -12,6 +12,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DataGrid, GridToolbar, GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
 import * as XLSX from 'xlsx';
 import { openDB, IDBPDatabase } from 'idb';
+import { deleteFormData } from '../about/indexedDB';
 
 let db: IDBPDatabase | null = null;
 
@@ -76,7 +77,7 @@ const App = () => {
 
     // Save to IndexedDB
     if (!db) await initDB();
-    await db.add('formData', newFormData);
+    await db?.add('formData', newFormData);
 
     // Fetch updated data and show toast
     fetchFormData();
@@ -86,7 +87,7 @@ const App = () => {
   // Fetch data from IndexedDB
   const fetchFormData = async () => {
     if (!db) await initDB();
-    const allData = await db.getAll('formData');
+    const allData = await db?.getAll('formData');
     setRows(allData);
   };
 
@@ -99,13 +100,34 @@ const App = () => {
   };
 
   // Handle multiple row deletion
-  const deleteSelectedRows = async () => {
-    if (!db) await initDB();
-    for (let id of rowSelectionModel) {
-      await db.delete('formData', id);
+  const handleDelete = async () => {
+    const idsToDelete = rowSelectionModel.map((id) => Number(id));
+    console.log(idsToDelete)
+    await deleteFormData(idsToDelete)
+    // setInProgress(true)
+    // setMessage("Records deleted succefully.")
+    // setTimeout(()=> setInProgress(false),3000)
+    setRows((prevRows) => prevRows.filter((row) => !idsToDelete.includes(row.id)));
+    setRowSelectionModel([]);
+  };
+
+  // Handle File Downloads
+  const downloadFileForSelectedRow = async () => {
+    const fileId = rowSelectionModel.map((id) => Number(id));
+    const record = await db?.get('formData', fileId[0]);
+    console.log(fileId[0], record.file)
+
+    if (record.file) {
+      const url = URL.createObjectURL(record.file);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = record.file.name;
+      a.click();
+      URL.revokeObjectURL(url);
+    } else {
+      console.error('File not found in IndexedDB');
     }
-    fetchFormData();
-    setToast({ open: true, message: 'Selected rows deleted!' });
+    // setToast({ open: true, message: 'Selected rows deleted!' });
   };
 
   useEffect(() => {
@@ -200,7 +222,7 @@ const App = () => {
           type="file"
           accept="application/pdf"
           onChange={(e) => {
-            const file = e.target.files?.[0];
+            const file:File = e.target.files?.[0];
             setFormData({ ...formData, file });
             setErrorMessages({ ...errorMessages, file: file && file.size > 2 * 1024 * 1024 ? 'File size must be less than 2 MB' : '' });
           }}
@@ -210,10 +232,12 @@ const App = () => {
       </form>
 
       <Typography variant="h5" mt={5}>Saved Data</Typography>
-      <Toolbar>
+      <div style={{display: "inline-flex", margin: "20px 0", gridGap: "20px"}}>
         <Button onClick={exportToExcel} variant="outlined" color="primary">Export to Excel</Button>
-        <Button onClick={deleteSelectedRows} variant="outlined" color="secondary">Delete Selected</Button>
-      </Toolbar>
+        <Button onClick={handleDelete} variant="outlined" color="primary">Delete Records</Button>
+        <Button onClick={downloadFileForSelectedRow} variant="outlined" color="secondary">Download File For Selected Row</Button>
+      </div>
+      
       <DataGrid
         rows={rows.map((row, index) => ({ ...row, id: row.id }))}
         columns={[

@@ -25,7 +25,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import * as XLSX from 'xlsx';
 import { DataGrid, GridToolbar, GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import { saveFormData, getAllFormData, deleteFormData } from './indexedDB';
+import { saveFormData, getAllFormData, deleteFormData, getDB } from './indexedDB';
 
 export type FormState = {
   id: number;
@@ -53,7 +53,7 @@ export default function FormComponent() {
     gender: "",
     vegetarian: false,
     salary: 1000,
-    file: null
+    file: null as File | null,
   });
   const [errors, setErrors] = useState<{ [key in keyof FormState]?: string }>({});
   const [rows, setRows] = useState<FormState[]>([]);
@@ -160,7 +160,7 @@ export default function FormComponent() {
     if (validateForm()) {
       console.log(formState);
 
-      const newEntry = {
+      const newEntry:FormState = {
         ...formState,
         id: idCounter,
         dob: new Date(String(formState.dob)) //, // Convert Date to string for display
@@ -218,7 +218,30 @@ export default function FormComponent() {
     setRows((prevRows) => prevRows.filter((row) => !idsToDelete.includes(row.id)));
     setRowSelectionModel([]);
   };
+  
+  // Handle File Downloads
+  const downloadFileForSelectedRow = async () => {
+    const fileId = rowSelectionModel.map((id) => Number(id));
 
+    fileId.forEach(async (id) =>  {
+      const myDB = await getDB()
+      const record =  await myDB?.get('formData', id)
+      console.log(id, record.file)
+
+      if (record.file) {
+        const url = URL.createObjectURL(record.file);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = record.file.name;
+        a.click();
+        URL.revokeObjectURL(url);
+      } else {
+        console.error('File not found in IndexedDB');
+      }
+      // setToast({ open: true, message: 'Selected rows deleted!' });
+    })
+  };
+  
   function SlideTransition(props: SlideProps) {
     return <Slide {...props} direction="up" />;
   }
@@ -321,7 +344,17 @@ export default function FormComponent() {
             // )}
           />
         </LocalizationProvider>
+        
+        <input
+          type="file"
+          style={{margin: "15px"}}
+          accept="application/pdf"
+          onChange={(e) => handleChange("file", e.target.files?.[0])}
+          // setErrorMessages({ ...errorMessages, file: file && file.size > 2 * 1024 * 1024 ? 'File size must be less than 2 MB' : '' });
 
+        />
+        {/* {errorMessages.file && <Typography color="error">{errorMessages.file}</Typography>} */}
+        
         <Box sx={{ display: "inline-flex", gridGap: "120px" }}>
           {/* Gender Field */}
           <FormControl
@@ -415,7 +448,7 @@ export default function FormComponent() {
               >
                 Export to Excel
               </Button>
-
+              
               <Button
                 variant="contained"
                 color="error"
@@ -424,6 +457,16 @@ export default function FormComponent() {
                 disabled={rowSelectionModel.length === 0}
               >
                 Delete Selected
+              </Button>
+
+              <Button
+                variant="contained"
+                color="Primary"
+                onClick={downloadFileForSelectedRow}
+                style={{ marginTop: '10px', height: "30px" }}
+                disabled={rowSelectionModel.length === 0}
+              >
+                Download File
               </Button>
             </div>
           </div>
