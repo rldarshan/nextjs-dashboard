@@ -21,6 +21,11 @@ export async function saveFormData(data: typeof FormState) {
   await tx.done;
 }
 
+export const addDataToDB = async (data: Record<string, any>) => {
+  // const db = await initDB();
+  await db?.put('formData', data);
+};
+
 export async function getAllFormData() {
   if (!db) await initDB();
   const tx = db!.transaction('formData', 'readonly');

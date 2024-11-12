@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   TextField,
   Select,
@@ -14,10 +14,13 @@ import {
   Checkbox,
   Button,
   Box,
+  Card,
   Alert,
   Snackbar,
   Typography,
 } from "@mui/material";
+// import { v4 as uuidv4 } from 'uuid';
+import CardContent from '@mui/material/CardContent';
 import Slide, { SlideProps } from '@mui/material/Slide';
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -25,7 +28,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import * as XLSX from 'xlsx';
 import { DataGrid, GridToolbar, GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import { saveFormData, getAllFormData, deleteFormData, getDB } from './indexedDB';
+import { saveFormData, getAllFormData, deleteFormData, addDataToDB, getDB } from './indexedDB';
 
 export type FormState = {
   id: number;
@@ -57,22 +60,26 @@ export default function FormComponent() {
   });
   const [errors, setErrors] = useState<{ [key in keyof FormState]?: string }>({});
   const [rows, setRows] = useState<FormState[]>([]);
-  const [idCounter, setIdCounter] = useState(1);
+  const [idCounter, setIdCounter] = useState(1) // <number | undefined>(undefined);
   const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>([]);
   const [inProgress, setInProgress] = useState(false);
   const [message, setMessage] = useState("");
+  const [excelFile, setExcelFile] = useState<File | null>(null);
+  const excelImportRef = useRef(null);
+  const inputRef = useRef(null);
 
   const columns: GridColDef[] = [
-    { field: 'id', headerName: 'Id', width: 50 },
-    { field: 'name', headerName: 'Name', width: 150 },
-    { field: 'email', headerName: 'Email', width: 200 },
-    { field: 'country', headerName: 'Country', width: 120 },
-    { field: 'age', headerName: 'Age', width: 80 },
-    { field: 'address', headerName: 'Address', width: 250 },
+    { field: 'id', headerName: 'Id', width: 50, type: 'number' },
+    { field: 'name', headerName: 'Name', width: 150, type: 'string' },
+    { field: 'email', headerName: 'Email', width: 200, type: 'string' },
+    { field: 'country', headerName: 'Country', width: 120, type: 'string' },
+    { field: 'age', headerName: 'Age', width: 80, type: 'number' },
+    { field: 'address', headerName: 'Address', width: 250, type: 'string' },
     { field: 'dob', headerName: 'Date of Birth', width: 130 },
-    { field: 'gender', headerName: 'Gender', width: 100 },
+    { field: 'gender', headerName: 'Gender', width: 100, type: 'string' },
     { field: 'vegetarian', headerName: 'Vegetarian', width: 120, type: 'boolean' },
     { field: 'salary', headerName: 'Salary', width: 150, type: 'number' },
+    { field: 'file', headerName: 'File', width: 150 },
   ];
 
   const validateForm = (): boolean => {
@@ -141,12 +148,69 @@ export default function FormComponent() {
     const loadData = async () => {
       const savedData = await getAllFormData();
       setRows(savedData);
+      // setIdCounter(uuidv4())
       if (savedData.length > 0) {
         setIdCounter(savedData[savedData.length - 1].id + 1); // Set idCounter based on last ID
       }
     };
     loadData();
   }, []);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setExcelFile(event.target.files[0]);
+    }
+  };
+
+  const convertBlobToBase64 = (blob: Blob): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
+  
+  const excelFileImport = async () => {
+    if (!excelFile) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const arrayBuffer = e.target?.result as ArrayBuffer;
+      const data = new Uint8Array(arrayBuffer);
+      const workbook = XLSX.read(data, { type: 'array' });
+
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+      // console.log("==== jsonData ====",jsonData)
+      // Add each row to IndexedDB
+      for (const row of jsonData) {
+        await addDataToDB({ ...row, id: row['id'] });
+      }
+
+      // setRows((prev) => [...prev, jsonData]);
+      
+      const loadData = async () => {
+        const savedData = await getAllFormData();
+        setRows(savedData);
+        // setIdCounter(uuidv4())
+        if (savedData.length > 0) {
+          setIdCounter(savedData[savedData.length - 1].id + 1); // Set idCounter based on last ID
+        }
+      };
+      loadData();
+      
+      setExcelFile(null)
+      excelImportRef.current.value = null;    //  clear file import input element
+
+      setInProgress(true)
+      setMessage('Data has been imported to IndexedDB');
+      setTimeout(()=> setInProgress(false),3000)
+    };
+    reader.readAsArrayBuffer(excelFile);
+  };
 
   const handleExport = () => {
     const worksheet = XLSX.utils.json_to_sheet(rows);
@@ -168,6 +232,7 @@ export default function FormComponent() {
 
       setRows((prev) => [...prev, newEntry]);
       setIdCounter((prev) => prev + 1);
+      // setIdCounter(uuidv4());
 
       // Save to IndexedDB
       await saveFormData(newEntry);
@@ -189,6 +254,7 @@ export default function FormComponent() {
         salary: 1000,
         file: null
       });
+      inputRef.current.value = null;    //  clear file import input element
 
 
       // Send the form data to the server
@@ -346,7 +412,7 @@ export default function FormComponent() {
         </LocalizationProvider>
         
         <input
-          type="file"
+          type="file" ref={inputRef}
           style={{margin: "15px"}}
           accept="application/pdf"
           onChange={(e) => handleChange("file", e.target.files?.[0])}
@@ -415,6 +481,26 @@ export default function FormComponent() {
         </Button>
       </form>
       
+      <br></br>
+      <div style={{ maxWidth: "600px", margin: "auto" }}>
+        <Card variant="outlined">
+          <CardContent>
+            <h2>Import Data from Excel</h2>
+            <br></br>
+            <input
+                type="file" ref={excelImportRef}
+                style={{margin: "15px"}}
+                accept=".xlsx, .xls"
+                onChange={handleFileChange}
+                // setErrorMessages({ ...errorMessages, file: file && file.size > 2 * 1024 * 1024 ? 'File size must be less than 2 MB' : '' });
+              />
+            <button onClick={excelFileImport} disabled={!excelFile}>
+              Import Data
+            </button>
+          </CardContent>
+        </Card>
+      </div>
+
       <Snackbar open={inProgress} TransitionComponent={SlideTransition}>
         <Alert severity="info" icon={<CheckCircleOutlineIcon style={{ color: 'green', fontSize: '25px' }}  />}>
             {message}
