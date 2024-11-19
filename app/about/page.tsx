@@ -519,10 +519,10 @@ export default function FormComponent() {
             <DataGrid
               rows={rows}
               columns={columns}
-              pageSize={5}
-              rowsPerPageOptions={[5, 10, 20]}
+              // pageSize={5}
+              // rowsPerPageOptions={[5, 10, 20]}
               checkboxSelection
-              disableSelectionOnClick
+              // disableSelectionOnClick
               rowSelectionModel={rowSelectionModel}
               onRowSelectionModelChange={(newRowSelectionModel: any) => setRowSelectionModel(newRowSelectionModel)}
               // slots={{ toolbar: GridToolbar }}
@@ -551,7 +551,7 @@ export default function FormComponent() {
 
               <Button
                 variant="contained"
-                color="Primary"
+                // color="Primary"
                 onClick={downloadFileForSelectedRow}
                 style={{ marginTop: '10px', height: "30px" }}
                 disabled={rowSelectionModel.length === 0}
