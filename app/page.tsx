@@ -16,6 +16,11 @@ const LoginPage = () => {
     console.log("Email:", email);
     console.log("Password:", password);
     // Add login logic here (API call)
+    if (email == 'rl.darshan01@gmail.com' && password == 'test') {
+      router.push("/dashboard");
+    } else {
+      alert("Invalid Credentials")
+    }
   };
 
   const handleFacebookLogin = async (): Promise<void> => {
