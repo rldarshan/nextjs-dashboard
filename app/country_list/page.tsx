@@ -21,7 +21,7 @@ export default function Country() {
   return (
     <div className="App">
       <h1>Country List</h1>
-      <table border="1" style={{ width: '100%', textAlign: 'left'}}>
+      <table border={1} style={{ width: '100%', textAlign: 'left'}}>
         <thead>
           <tr>
             <th>Name</th>
