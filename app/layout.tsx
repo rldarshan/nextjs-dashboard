@@ -1,6 +1,6 @@
 "use client";
 
-import "./global-styles.css";
+import "./styles/global_styles.css";
 import Header from "./header";
 import Footer from "./footer";
 import React, { useEffect } from "react";
@@ -18,8 +18,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Header />
-        <br></br>
+        {/* <Header />
+        <br></br> */}
 
         <main>{children}</main>
 

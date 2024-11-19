@@ -24,6 +24,7 @@
     "bcrypt": "^5.1.1",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
+    "firebase": "^11.0.2",
     "idb": "^8.0.0",
     "mdb-react-ui-kit": "^9.0.0",
     "next": "15.0.0-canary.56",
