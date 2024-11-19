@@ -65,8 +65,8 @@ export default function FormComponent() {
   const [inProgress, setInProgress] = useState(false);
   const [message, setMessage] = useState("");
   const [excelFile, setExcelFile] = useState<File | null>(null);
-  const excelImportRef = useRef(null);
-  const inputRef = useRef(null);
+  const excelImportRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'Id', width: 50, type: 'number' },
@@ -182,13 +182,13 @@ export default function FormComponent() {
 
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+      const jsonData:FormState[] = XLSX.utils.sheet_to_json(worksheet);
 
-      // console.log("==== jsonData ====",jsonData)
+      console.log("==== jsonData ====",jsonData)
       // Add each row to IndexedDB
-      for (const row of jsonData) {
-        await addDataToDB({ ...row, id: row['id'] });
-      }
+      const newData = jsonData.map(async (item) => (
+        await addDataToDB({ ...item, id: item.id }))
+      );
 
       // setRows((prev) => [...prev, jsonData]);
       
@@ -203,7 +203,9 @@ export default function FormComponent() {
       loadData();
       
       setExcelFile(null)
-      excelImportRef.current.value = null;    //  clear file import input element
+      if (excelImportRef.current) { 
+        (excelImportRef.current.value as string | null) = null;     //  clear file import input element
+      }
 
       setInProgress(true)
       setMessage('Data has been imported to IndexedDB');
@@ -254,8 +256,10 @@ export default function FormComponent() {
         salary: 1000,
         file: null
       });
-      inputRef.current.value = null;    //  clear file import input element
 
+      if (inputRef.current) { 
+        (inputRef.current.value as string | null) = null;     //  clear file import input element
+      }
 
       // Send the form data to the server
       // fetch('/api/addUser', {

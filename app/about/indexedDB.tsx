@@ -13,7 +13,7 @@ export async function initDB() {
   });
 }
 
-export async function saveFormData(data: typeof FormState) {
+export async function saveFormData(data: any) {
   if (!db) await initDB();
   const tx = db!.transaction('formData', 'readwrite');
   const store = tx.objectStore('formData');
