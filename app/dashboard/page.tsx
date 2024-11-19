@@ -1,7 +1,14 @@
 "use client"
+import Header from "../header";
 
 export default function App(){
-  return (<h1>Welcome to Dashboard..!</h1>)
+  return (
+  <>
+    <Header />
+    <br></br> 
+    <h1>Welcome to Dashboard..!</h1>
+  </>
+)
 }
 // import React, { useState, useEffect } from 'react';
 // import {

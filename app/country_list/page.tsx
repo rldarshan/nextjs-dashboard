@@ -1,5 +1,6 @@
 "use client"
 
+import Header from "../header";
 import React, { useState, useEffect } from 'react';
 
 export default function Country() {
@@ -19,26 +20,31 @@ export default function Country() {
   }, [])
 
   return (
-    <div className="App">
-      <h1>Country List</h1>
-      <table border={1} style={{ width: '100%', textAlign: 'left'}}>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Flag</th>
-          </tr>
-        </thead>
-        <tbody>
-          {countries.map((country, index) => (
-            <tr key={index}>
-              <td>{country['name']}</td>
-              <td>
-                <img src={country['flag']} alt={`Flag of ${country['name']}`} width="50" />
-              </td>
+    <>
+      <Header />
+      <br></br>
+      
+      <div className="App">
+        <h1>Country List</h1>
+        <table border={1} style={{ width: '100%', textAlign: 'left'}}>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Flag</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {countries.map((country, index) => (
+              <tr key={index}>
+                <td>{country['name']}</td>
+                <td>
+                  <img src={country['flag']} alt={`Flag of ${country['name']}`} width="50" />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Header from "../header";
 import React, { useState, useEffect, useRef } from "react";
 import {
   TextField,
@@ -318,6 +319,9 @@ export default function FormComponent() {
   
   return (
     <>
+      <Header />
+      <br></br> 
+    
       <form
         onSubmit={handleSubmit}
         style={{ maxWidth: "600px", margin: "auto" }}
