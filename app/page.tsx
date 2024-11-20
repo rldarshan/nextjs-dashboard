@@ -1,25 +1,41 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import "./styles/login_styles.css";
 import { auth } from "../firebaseConfig";
-import { getAuth, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider } from "firebase/auth";
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+} from "firebase/auth";
 import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const formRef = useRef<HTMLInputElement | null>(null);
+  const loaderRef = useRef<HTMLInputElement | null>(null);
 
   const handleLogin = (e: any) => {
     e.preventDefault();
+    
+    if (formRef.current) { 
+      (formRef.current.style.opacity as string | null) = '0.5';
+    }
+
+    if (loaderRef.current) { 
+      (loaderRef.current.style.display as string | null) = 'block';
+    }
+
     console.log("Email:", email);
     console.log("Password:", password);
     // Add login logic here (API call)
-    if (email == 'rl.darshan01@gmail.com' && password == 'test') {
+    if (email == "rl.darshan01@gmail.com" && password == "test") {
       router.push("/dashboard");
     } else {
-      alert("Invalid Credentials")
+      alert("Invalid Credentials");
     }
   };
 
@@ -50,7 +66,11 @@ const LoginPage = () => {
 
   return (
     <div className="container">
-      <div className="form-container">
+      <div id="loader-wrapper">
+        <div id="loader" ref={loaderRef}></div>
+      </div>
+
+      <div className="form-container" ref={formRef}>
         <h2 className="title">Login</h2>
         <form onSubmit={handleLogin} className="form">
           <input
