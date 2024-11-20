@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import "./styles/login_styles.css";
-import { auth } from "../firebaseConfig";
+import { initializeApp } from "firebase/app";
 import {
   getAuth,
   signInWithPopup,
@@ -10,6 +10,16 @@ import {
   FacebookAuthProvider,
 } from "firebase/auth";
 import { useRouter } from "next/navigation";
+
+
+const firebaseConfig = {
+  apiKey: process.env.API_KEY,
+  authDomain: "myangularfirebase-74aff.firebaseapp.com",
+  projectId: "myangularfirebase-74aff",
+  storageBucket: "myangularfirebase-74aff.appspot.com",
+  messagingSenderId: "431015899903",
+  appId: "1:431015899903:web:01fe0314456e33ec",
+};
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -20,13 +30,13 @@ const LoginPage = () => {
 
   const handleLogin = (e: any) => {
     e.preventDefault();
-    
-    if (formRef.current) { 
-      (formRef.current.style.opacity as string | null) = '0.5';
+
+    if (formRef.current) {
+      (formRef.current.style.opacity as string | null) = "0.5";
     }
 
-    if (loaderRef.current) { 
-      (loaderRef.current.style.display as string | null) = 'block';
+    if (loaderRef.current) {
+      (loaderRef.current.style.display as string | null) = "block";
     }
 
     console.log("Email:", email);
@@ -52,14 +62,20 @@ const LoginPage = () => {
   };
 
   const handleGoogleLogin = async (): Promise<void> => {
-    if (formRef.current) { 
-      (formRef.current.style.opacity as string | null) = '0.5';
+    if (formRef.current) {
+      (formRef.current.style.opacity as string | null) = "0.5";
     }
 
-    if (loaderRef.current) { 
-      (loaderRef.current.style.display as string | null) = 'block';
+    if (loaderRef.current) {
+      (loaderRef.current.style.display as string | null) = "block";
       // (loaderRef.current.style.zIndex as string | null) = '2';
     }
+
+    // Initialize Firebase app
+    const app = initializeApp(firebaseConfig);
+
+    // Example: Initialize Firebase services
+    const auth = getAuth(app);
 
     const provider = new GoogleAuthProvider();
     try {
