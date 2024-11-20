@@ -49,17 +49,17 @@ const LoginPage = () => {
     }
   };
 
-  const handleFacebookLogin = async (): Promise<void> => {
-    const provider = new FacebookAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      console.log("Facebook Login Success:", user);
-      // Handle user token or send to backend
-    } catch (error) {
-      console.error("Facebook Login Error:", (error as Error).message);
-    }
-  };
+  // const handleFacebookLogin = async (): Promise<void> => {
+  //   const provider = new FacebookAuthProvider();
+  //   try {
+  //     const result = await signInWithPopup(auth, provider);
+  //     const user = result.user;
+  //     console.log("Facebook Login Success:", user);
+  //     // Handle user token or send to backend
+  //   } catch (error) {
+  //     console.error("Facebook Login Error:", (error as Error).message);
+  //   }
+  // };
 
   const handleGoogleLogin = async (): Promise<void> => {
     if (formRef.current) {
