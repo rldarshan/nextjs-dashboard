@@ -52,6 +52,15 @@ const LoginPage = () => {
   };
 
   const handleGoogleLogin = async (): Promise<void> => {
+    if (formRef.current) { 
+      (formRef.current.style.opacity as string | null) = '0.5';
+    }
+
+    if (loaderRef.current) { 
+      (loaderRef.current.style.display as string | null) = 'block';
+      // (loaderRef.current.style.zIndex as string | null) = '2';
+    }
+
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
@@ -105,14 +114,14 @@ const LoginPage = () => {
           >
             Sign in with Google
           </button>
-          <button
+          {/* <button
             type="button"
             onClick={handleFacebookLogin}
             className="social-button"
             style={{ backgroundColor: "#4267B2" }}
           >
             Sign in with Facebook
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

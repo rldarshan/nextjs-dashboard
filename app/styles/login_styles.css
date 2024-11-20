@@ -91,6 +91,7 @@ button {
     width: 300px;
     height: 400px;
     text-align: center;
+    z-index: 0;
 }
 
 #loader {
