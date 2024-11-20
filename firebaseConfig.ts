@@ -3,7 +3,7 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBdUd6j_UJcIPJKUlODxJrBgKeninMWopE",
+    apiKey: process.env.API_KEY,
     authDomain: "myangularfirebase-74aff.firebaseapp.com",
     projectId: "myangularfirebase-74aff",
     storageBucket: "myangularfirebase-74aff.appspot.com",
@@ -20,5 +20,3 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 export { app, auth, db };
-
-// export default firebase;
