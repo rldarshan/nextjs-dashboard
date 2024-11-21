@@ -1,14 +1,7 @@
 "use client";
 
 import "./styles/global_styles.css";
-import Header from "./header";
-import Footer from "./footer";
-import React, { useEffect } from "react";
-
-import "@fontsource/roboto/300.css";
-import "@fontsource/roboto/400.css";
-import "@fontsource/roboto/500.css";
-import "@fontsource/roboto/700.css";
+import { AuthProvider } from "./auth_context";
 
 export default function RootLayout({
   children,
@@ -18,12 +11,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* <Header />
-        <br></br> */}
-
-        <main>{children}</main>
-
-        {/* <Footer /> */}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

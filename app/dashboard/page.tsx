@@ -1,7 +1,11 @@
 "use client"
 import Header from "../header";
+import { useAuth  } from "../auth_context";
 
 export default function App(){
+  const { userData } = useAuth();
+  console.log("==== userData ==== ",userData)
+
   return (
   <>
     <Header />

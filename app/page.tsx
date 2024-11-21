@@ -10,10 +10,13 @@ import {
   FacebookAuthProvider,
 } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import { useAuth  } from "./auth_context";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { setUserData } = useAuth();
+
   const router = useRouter();
   const formRef = useRef<HTMLInputElement | null>(null);
   const loaderRef = useRef<HTMLInputElement | null>(null);
@@ -67,6 +70,7 @@ const LoginPage = () => {
       const user = result.user;
       console.log("Google Login Success:", user);
       // Handle user token or send to backend
+      setUserData(user);
       router.push("/dashboard");
     } catch (error) {
       console.error("Google Login Error:", (error as Error).message);
