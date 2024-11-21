@@ -103,12 +103,12 @@ const LoginPage = () => {
           <button type="submit">Login</button>
         </form>
 
-        <p className="text">
+        {/* <p className="text">
           Don't have an account?{" "}
           <a href="/signup" className="link">
             Sign up
           </a>
-        </p>
+        </p> */}
 
         <div className="social-container">
           <button

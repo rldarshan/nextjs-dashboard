@@ -46,7 +46,7 @@ export default function Header() {
               
               <MDBNavbarItem>
                 <MDBNavbarLink aria-current="page" href="/">
-                  Home
+                  Login Page
                 </MDBNavbarLink>
               </MDBNavbarItem>
 
