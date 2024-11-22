@@ -1,6 +1,7 @@
 "use client"
 import Header from "../header";
 import { useAuth  } from "../auth_context";
+import '../styles/global_styles.css';
 
 export default function App(){
   const { userData } = useAuth();
@@ -9,8 +10,10 @@ export default function App(){
   return (
   <>
     <Header />
-    <br></br> 
-    <h1>Welcome to Dashboard..!</h1>
+      {userData ? <><br></br> <img className="user-img" src={userData?.photoURL} alt="User_img" /> </>: ''}
+      
+      <br></br> 
+      <h1>Hi {userData?.displayName}, Welcome to Dashboard..!</h1>
   </>
 )
 }

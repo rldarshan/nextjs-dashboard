@@ -3,6 +3,10 @@ body {
   font-family: Roboto, Helvetica, Arial, sans-serif;
 }
 
+.user-img{
+  border-radius: 50%;
+}
+
 @media (min-width: 992px) {
   .collapse .collapse-content {
     display: flex;
