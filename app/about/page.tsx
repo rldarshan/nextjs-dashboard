@@ -324,7 +324,7 @@ export default function FormComponent() {
     
       <form
         onSubmit={handleSubmit}
-        style={{ maxWidth: "600px", margin: "auto" }}
+        style={{ maxWidth: "600px", margin: "auto", padding: "0 20px" }}
       >
         <Typography variant="h4" gutterBottom>
           Registration Form
@@ -519,7 +519,7 @@ export default function FormComponent() {
         <>
           <br></br>
 
-          <div style={{ height: 300, width: "90%", display: "flex", gap: "30px" }}>
+          <div style={{ width: "100%", margin: "auto", padding: "0 20px" }}>
             <DataGrid
               rows={rows}
               columns={columns}
@@ -533,7 +533,7 @@ export default function FormComponent() {
               // loading={loading}
             />
 
-            <div style={{display: "grid"}}>
+            <div style={{display: "grid", margin: "auto", width: "200px" }}>
               <Button
                 variant="contained"
                 color="primary"

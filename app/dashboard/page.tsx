@@ -61,6 +61,7 @@ export default function App() {
       .get(`${API_URL}/get_all_users`)
       .then((response) => {
         console.log("==== Firebase API 'get_all_users' Data ==== ", response.data);
+        setRows(response.data);
         setMessage(response.data.message);
       })
       .catch((error) => {
@@ -92,8 +93,8 @@ export default function App() {
     { field: 'address', headerName: 'Address', width: 250, type: 'string' },
     { field: 'dob', headerName: 'Date of Birth', width: 130 },
     { field: 'gender', headerName: 'Gender', width: 100, type: 'string' },
-    { field: 'vegetarian', headerName: 'Vegetarian', width: 120, type: 'boolean' },
-    { field: 'salary', headerName: 'Salary', width: 150, type: 'number' },
+    { field: 'vegetarian', headerName: 'Vegetarian', width: 50, type: 'boolean' },
+    { field: 'salary', headerName: 'Salary', width: 50, type: 'number' },
     { field: 'file', headerName: 'File', width: 150 },
   ];
 
@@ -241,7 +242,7 @@ export default function App() {
 
       <form
         onSubmit={handleSubmit}
-        style={{ maxWidth: "600px", margin: "auto" }}
+        style={{ maxWidth: "600px", margin: "auto", padding: "0 20px" }}
       >
         <Typography variant="h4" gutterBottom>
           Registration Form
@@ -445,7 +446,7 @@ export default function App() {
           <br></br>
 
           <div
-            style={{ height: 300, width: "90%", display: "flex", gap: "30px" }}
+            style={{ width: "100%", margin: "auto", padding: "0 20px" }}
           >
             <DataGrid
               rows={rows}
