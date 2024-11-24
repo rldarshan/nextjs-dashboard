@@ -2,21 +2,39 @@
 import Header from "../header";
 import { useAuth  } from "../auth_context";
 import '../styles/global_styles.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
+const API_URL = "https://api-7bjw3wubma-uc.a.run.app/";   // "http://127.0.0.1:5001/myangularfirebase-74aff/us-central1/api";
 
 export default function App(){
   const { userData } = useAuth();
   console.log("==== userData ==== ",userData)
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    axios
+      .get(`${API_URL}/hello`)
+      .then((response) => {
+        console.log("==== Firebase API Data ==== ",response.data)
+        setMessage(response.data.message);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
 
   return (
-  <>
-    <Header />
-      {userData ? <><br></br> <img className="user-img" src={userData?.photoURL} alt="User_img" /> </>: ''}
-      
-      <br></br> 
-      <h1>Hi {userData?.displayName}, Welcome to Dashboard..!</h1>
-  </>
-)
+    <>
+      <Header />
+        {userData ? <><br></br> <img className="user-img" src={userData?.photoURL} alt="User_img" /> </>: ''}
+        
+        <br></br> 
+        <h1>Hi {userData?.displayName}, Welcome to Dashboard..!</h1>
+    </>
+  )
 }
+
 // import React, { useState, useEffect } from 'react';
 // import {
 //   Box, Button, TextField, Select, MenuItem, InputLabel, FormControl,
