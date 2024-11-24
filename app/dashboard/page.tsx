@@ -1,22 +1,66 @@
-"use client"
+"use client";
+
 import Header from "../header";
-import { useAuth  } from "../auth_context";
-import '../styles/global_styles.css';
-import React, { useEffect, useState } from "react";
+import { useAuth } from "../auth_context";
+import "../styles/global_styles.css";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 
-const API_URL = "https://api-7bjw3wubma-uc.a.run.app/";   // "http://127.0.0.1:5001/myangularfirebase-74aff/us-central1/api";
+import {
+  Box,
+  Button,
+  TextField,
+  Select,
+  MenuItem,
+  FormLabel,
+  FormControl,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Checkbox,
+  Slider,
+  Typography,
+  Snackbar,
+  Alert,
+  Toolbar,
+} from "@mui/material";
+import Slide, { SlideProps } from '@mui/material/Slide';
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { DataGrid,GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
-export default function App(){
+const API_URL = "https://api-7bjw3wubma-uc.a.run.app/"; 
+// const API_URL = "http://127.0.0.1:5001/myangularfirebase-74aff/us-central1/api";
+
+export type FormData = {
+  id: number;
+  name: string;
+  email: string;
+  country: string;
+  age: string;
+  address: string;
+  dob: Date | null;
+  gender: string;
+  vegetarian: boolean;
+  salary: number;
+  file: Blob | null;
+}
+
+export default function App() {
   const { userData } = useAuth();
-  console.log("==== userData ==== ",userData)
   const [message, setMessage] = useState("");
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [inProgress, setInProgress] = useState(false);
 
   useEffect(() => {
-    axios
-      .get(`${API_URL}/hello`)
+  console.log("==== userData ==== ", userData);
+
+  axios
+      .get(`${API_URL}/get_all_users`)
       .then((response) => {
-        console.log("==== Firebase API Data ==== ",response.data)
+        console.log("==== Firebase API 'get_all_users' Data ==== ", response.data);
         setMessage(response.data.message);
       })
       .catch((error) => {
@@ -24,287 +68,433 @@ export default function App(){
       });
   }, []);
 
+  // Form state
+  const [formData, setFormData] = useState({
+    id: 0,
+    name: "",
+    email: "",
+    country: "",
+    age: "",
+    address: "",
+    dob: null,
+    gender: "",
+    vegetarian: false,
+    salary: 1000,
+    file: null as File | null,
+  });
+
+  const columns: GridColDef[] = [
+    { field: 'id', headerName: 'Id', width: 50, type: 'number' },
+    { field: 'name', headerName: 'Name', width: 150, type: 'string' },
+    { field: 'email', headerName: 'Email', width: 200, type: 'string' },
+    { field: 'country', headerName: 'Country', width: 120, type: 'string' },
+    { field: 'age', headerName: 'Age', width: 80, type: 'number' },
+    { field: 'address', headerName: 'Address', width: 250, type: 'string' },
+    { field: 'dob', headerName: 'Date of Birth', width: 130 },
+    { field: 'gender', headerName: 'Gender', width: 100, type: 'string' },
+    { field: 'vegetarian', headerName: 'Vegetarian', width: 120, type: 'boolean' },
+    { field: 'salary', headerName: 'Salary', width: 150, type: 'number' },
+    { field: 'file', headerName: 'File', width: 150 },
+  ];
+
+  const [rows, setRows] = useState<any[]>([]);
+  const [rowSelectionModel, setRowSelectionModel] =
+    useState<GridRowSelectionModel>([]);
+  const [errors, setErrors] = useState<{ [key in keyof FormData]?: string }>({});
+  const [toast, setToast] = useState<{ open: boolean; message: string }>({
+    open: false,
+    message: "",
+  });
+
+  // Validation function
+  const validateForm = (): boolean => {
+    let valid = true;
+    let newErrors: { [key in keyof FormData]?: string } = {};
+
+    if (!formData.name) {
+      valid = false;
+      newErrors.name = "Name is required";
+    } else if (formData.name.length < 3 || formData.name.length > 30) {
+      valid = false;
+      newErrors.name = "Name must be between 3 and 30 characters";
+    }
+
+    if (!formData.email) {
+      valid = false;
+      newErrors.email = "Email is required";
+    } else if (
+      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(formData.email)
+    ) {
+      valid = false;
+      newErrors.email = "Invalid email format";
+    }
+
+    if (!formData.country) {
+      valid = false;
+      newErrors.country = "Country is required";
+    }
+
+    if (!formData.age) {
+      valid = false;
+      newErrors.age = "Age is required";
+    } else if (!/^[0-9]+$/.test(formData.age)) {
+      valid = false;
+      newErrors.age = "Age must be a number";
+    }
+
+    if (!formData.address) {
+      valid = false;
+      newErrors.address = "Address is required";
+    } else if (formData.address.length > 250) {
+      valid = false;
+      newErrors.address = "Address cannot exceed 250 characters";
+    }
+
+    if (!formData.dob) {
+      valid = false;
+      newErrors.dob = "Date of birth is required";
+    }
+
+    if (!formData.gender) {
+      valid = false;
+      newErrors.gender = "Gender is required";
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
+  // Form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    // Generate a unique ID for each new record
+    const uniqueId = Date.now();
+    const newFormData = { ...formData, id: uniqueId };
+
+    setRows((prev) => [...prev, newFormData]);
+    // setIdCounter((prev) => prev + 1);
+
+    // Save to Firestore DB
+    axios
+      .post(`${API_URL}/add_user_data`, newFormData)
+      .then((response) => {
+        console.log("==== Firebase API add_user_data ==== ", response.data);
+        setMessage(response.data.message);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+
+
+    // // Fetch updated data and show toast
+    // fetchFormData();
+    setToast({ open: true, message: "Form saved successfully!" });
+
+    setInProgress(true)
+    setMessage("User details added successfully!");
+    setTimeout(()=> setInProgress(false),3000)
+
+    setFormData({
+      id: 0,
+      name: '',
+      email: '',
+      country: '',
+      age: '',
+      address: '',
+      dob: null,
+      gender: '',
+      vegetarian: false,
+      salary: 1000,
+      file: null
+    });
+
+    if (inputRef.current) { 
+      (inputRef.current.value as string | null) = null;     //  clear file import input element
+    }
+
+  };
+
+  const handleChange = (field: keyof FormData, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+  
+  function SlideTransition(props: SlideProps) {
+    return <Slide {...props} direction="up" />;
+  }
+
   return (
     <>
       <Header />
-        {userData ? <><br></br> <img className="user-img" src={userData?.photoURL} alt="User_img" /> </>: ''}
-        
-        <br></br> 
-        <h1>Hi {userData?.displayName}, Welcome to Dashboard..!</h1>
+      {userData ? (
+        <>
+          <br></br>{" "}
+          <img className="user-img" src={userData?.photoURL} alt="User_img" />{" "}
+        </>
+      ) : (
+        ""
+      )}
+
+      <br></br>
+      <h1>Hi {userData?.displayName}, Welcome to Dashboard..!</h1>
+
+      <form
+        onSubmit={handleSubmit}
+        style={{ maxWidth: "600px", margin: "auto" }}
+      >
+        <Typography variant="h4" gutterBottom>
+          Registration Form
+        </Typography>
+
+        {/* Name Field */}
+        <TextField
+          label="Name"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={formData.name}
+          onChange={(e) => handleChange("name", e.target.value)}
+          error={!!errors.name}
+          helperText={errors.name}
+        />
+
+        {/* Email Field */}
+        <TextField
+          label="Email"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={formData.email}
+          onChange={(e) => handleChange("email", e.target.value)}
+          error={!!errors.email}
+          helperText={errors.email}
+        />
+
+        {/* Country Field */}
+        <FormControl fullWidth margin="normal" error={!!errors.country}>
+          <Select
+            value={formData.country}
+            onChange={(e) => handleChange("country", e.target.value)}
+            displayEmpty
+          >
+            <MenuItem value="" disabled>
+              Select Country
+            </MenuItem>
+            <MenuItem value="USA">USA</MenuItem>
+            <MenuItem value="Canada">Canada</MenuItem>
+            <MenuItem value="UK">UK</MenuItem>
+            {/* Add more countries as needed */}
+          </Select>
+          {errors.country && (
+            <Typography color="error">{errors.country}</Typography>
+          )}
+        </FormControl>
+
+        {/* Age Field */}
+        <TextField
+          label="Age"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={formData.age}
+          onChange={(e) => handleChange("age", e.target.value)}
+          error={!!errors.age}
+          helperText={errors.age}
+        />
+
+        {/* Address Field */}
+        <TextField
+          label="Address"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          multiline
+          rows={4}
+          value={formData.address}
+          onChange={(e) => handleChange("address", e.target.value)}
+          error={!!errors.address}
+          helperText={errors.address}
+        />
+
+        {/* Date of Birth Field */}
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            label="Date of Birth"
+            value={formData.dob}
+            onChange={(date: any) => handleChange("dob", date)}
+            // renderInput={(params: null) => (
+            //   <TextField
+            //     {...params}
+            //     variant="outlined"
+            //     fullWidth
+            //     margin="normal"
+            //     error={!!errors.dob}
+            //     helperText={errors.dob}
+            //   />
+            // )}
+          />
+        </LocalizationProvider>
+
+        <input
+          type="file"
+          ref={inputRef}
+          style={{ margin: "15px" }}
+          accept="application/pdf"
+          onChange={(e) => handleChange("file", e.target.files?.[0])}
+          // setErrorMessages({ ...errorMessages, file: file && file.size > 2 * 1024 * 1024 ? 'File size must be less than 2 MB' : '' });
+        />
+        {/* {errorMessages.file && <Typography color="error">{errorMessages.file}</Typography>} */}
+
+        <Box sx={{ display: "inline-flex", gridGap: "120px" }}>
+          {/* Gender Field */}
+          <FormControl
+            component="fieldset"
+            margin="normal"
+            error={!!errors.gender}
+          >
+            <FormLabel component="legend">Gender</FormLabel>
+            <RadioGroup
+              row
+              value={formData.gender}
+              onChange={(e) => handleChange("gender", e.target.value)}
+            >
+              <FormControlLabel value="male" control={<Radio />} label="Male" />
+              <FormControlLabel
+                value="female"
+                control={<Radio />}
+                label="Female"
+              />
+              <FormControlLabel
+                value="other"
+                control={<Radio />}
+                label="Other"
+              />
+            </RadioGroup>
+            {errors.gender && (
+              <Typography color="error">{errors.gender}</Typography>
+            )}
+          </FormControl>
+
+          {/* Vegetarian Checkbox */}
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={formData.vegetarian}
+                onChange={(e) => handleChange("vegetarian", e.target.checked)}
+              />
+            }
+            label="Vegetarian"
+          />
+        </Box>
+
+        {/* Salary Slider */}
+        <FormControl fullWidth margin="normal">
+          <Typography gutterBottom>Salary Range</Typography>
+          <Slider
+            min={1000}
+            max={10000}
+            step={1000}
+            value={formData.salary}
+            onChange={(e, value) => handleChange("salary", value as number)}
+            valueLabelDisplay="auto"
+          />
+        </FormControl>
+
+        <Button type="submit" variant="contained" color="primary" fullWidth>
+          Submit
+        </Button>
+      </form>
+
+      <br></br>
+      {/* <div style={{ maxWidth: "600px", margin: "auto" }}>
+        <Card variant="outlined">
+          <CardContent>
+            <h2>Import Data from Excel</h2>
+            <br></br>
+            <input
+              type="file"
+              ref={excelImportRef}
+              style={{ margin: "15px" }}
+              accept=".xlsx, .xls"
+              onChange={handleFileChange}
+              // setErrorMessages({ ...errorMessages, file: file && file.size > 2 * 1024 * 1024 ? 'File size must be less than 2 MB' : '' });
+            />
+            <button onClick={excelFileImport} disabled={!excelFile}>
+              Import Data
+            </button>
+          </CardContent>
+        </Card>
+      </div> */}
+
+      <Snackbar open={inProgress} TransitionComponent={SlideTransition}>
+        <Alert
+          severity="info"
+          icon={
+            <CheckCircleOutlineIcon
+              style={{ color: "green", fontSize: "25px" }}
+            />
+          }
+        >
+          {message}
+        </Alert>
+      </Snackbar>
+
+      {rows.length > 0 && (
+        <>
+          <br></br>
+
+          <div
+            style={{ height: 300, width: "90%", display: "flex", gap: "30px" }}
+          >
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              // pageSize={5}
+              // rowsPerPageOptions={[5, 10, 20]}
+              checkboxSelection
+              // disableSelectionOnClick
+              rowSelectionModel={rowSelectionModel}
+              onRowSelectionModelChange={(newRowSelectionModel: any) =>
+                setRowSelectionModel(newRowSelectionModel)
+              }
+              // slots={{ toolbar: GridToolbar }}
+              // loading={loading}
+            />
+
+            {/* <div style={{ display: "grid" }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleExport}
+                style={{ marginTop: "10px", height: "30px" }}
+              >
+                Export to Excel
+              </Button>
+
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleDelete}
+                style={{ marginTop: "10px", height: "30px" }}
+                disabled={rowSelectionModel.length === 0}
+              >
+                Delete Selected
+              </Button>
+
+              <Button
+                variant="contained"
+                // color="Primary"
+                onClick={downloadFileForSelectedRow}
+                style={{ marginTop: "10px", height: "30px" }}
+                disabled={rowSelectionModel.length === 0}
+              >
+                Download File
+              </Button>
+            </div> */}
+          </div>
+        </>
+      )}
     </>
-  )
+  );
 }
-
-// import React, { useState, useEffect } from 'react';
-// import {
-//   Box, Button, TextField, Select, MenuItem, InputLabel, FormControl,
-//   RadioGroup, FormControlLabel, Radio, Checkbox, Slider, Typography,
-//   Snackbar, Alert, Toolbar
-// } from '@mui/material';
-// import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-// import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-// import { DataGrid, GridToolbar, GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
-// import * as XLSX from 'xlsx';
-// import { openDB, IDBPDatabase } from 'idb';
-// import { deleteFormData } from '../about/indexedDB';
-
-// let db: IDBPDatabase | null = null;
-
-// export async function initDB() {
-//   db = await openDB('FormDB', 1, {
-//     upgrade(database) {
-//       if (!database.objectStoreNames.contains('newformData')) {
-//         database.createObjectStore('newformData', { keyPath: 'id', autoIncrement: true });
-//       }
-//     }
-//   });
-// }
-
-// const App = () => {
-//   // Form state
-//   const [formData, setFormData] = useState({
-//     id: 0,  // Add 'id' field to the form data state
-//     name: '',
-//     email: '',
-//     country: '',
-//     age: '',
-//     address: '',
-//     dob: null,
-//     gender: '',
-//     isVegetarian: false,
-//     salary: 1000,
-//     file: null as File | null,
-//   });
-
-//   const [rows, setRows] = useState<any[]>([]);
-//   const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>([]);
-//   const [errorMessages, setErrorMessages] = useState({
-//     name: '',
-//     email: '',
-//     age: '',
-//     address: '',
-//     file: '',
-//   });
-//   const [toast, setToast] = useState<{ open: boolean; message: string }>({ open: false, message: '' });
-
-//   // Validation function
-//   const validateForm = () => {
-//     const errors = {
-//       name: formData.name.length < 3 || formData.name.length > 30 ? 'Name must be between 3 and 30 characters' : '',
-//       email: !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email) ? 'Invalid email format' : '',
-//       age: isNaN(parseInt(formData.age)) ? 'Age must be a number' : '',
-//       address: formData.address.length > 250 ? 'Address cannot exceed 250 characters' : '',
-//       file: formData.file && formData.file.size > 2 * 1024 * 1024 ? 'File size must be less than 2 MB' : '',
-//     };
-//     setErrorMessages(errors);
-//     return Object.values(errors).every((err) => err === '');
-//   };
-
-//   // Form submission
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     if (!validateForm()) return;
-
-//     // Generate a unique ID for each new record
-//     const uniqueId = Date.now();
-//     const newFormData = { ...formData, id: uniqueId };
-
-//     // Save to IndexedDB
-//     if (!db) await initDB();
-//     await db?.add('formData', newFormData);
-
-//     // Fetch updated data and show toast
-//     fetchFormData();
-//     setToast({ open: true, message: 'Form saved successfully!' });
-//   };
-
-//   // Fetch data from IndexedDB
-//   const fetchFormData = async () => {
-//     if (!db) await initDB();
-//     const allData = await db?.getAll('formData');
-//     setRows(allData);
-//   };
-
-//   // Handle export to Excel
-//   const exportToExcel = () => {
-//     const ws = XLSX.utils.json_to_sheet(rows);
-//     const wb = XLSX.utils.book_new();
-//     XLSX.utils.book_append_sheet(wb, ws, 'FormData');
-//     XLSX.writeFile(wb, 'FormData.xlsx');
-//   };
-
-//   // Handle multiple row deletion
-//   const handleDelete = async () => {
-//     const idsToDelete = rowSelectionModel.map((id) => Number(id));
-//     console.log(idsToDelete)
-//     await deleteFormData(idsToDelete)
-//     // setInProgress(true)
-//     // setMessage("Records deleted succefully.")
-//     // setTimeout(()=> setInProgress(false),3000)
-//     setRows((prevRows) => prevRows.filter((row) => !idsToDelete.includes(row.id)));
-//     setRowSelectionModel([]);
-//   };
-
-//   // Handle File Downloads
-//   const downloadFileForSelectedRow = async () => {
-//     const fileId = rowSelectionModel.map((id) => Number(id));
-//     const record = await db?.get('formData', fileId[0]);
-//     console.log(fileId[0], record.file)
-
-//     if (record.file) {
-//       const url = URL.createObjectURL(record.file);
-//       const a = document.createElement('a');
-//       a.href = url;
-//       a.download = record.file.name;
-//       a.click();
-//       URL.revokeObjectURL(url);
-//     } else {
-//       console.error('File not found in IndexedDB');
-//     }
-//     // setToast({ open: true, message: 'Selected rows deleted!' });
-//   };
-
-//   useEffect(() => {
-//     fetchFormData();
-//   }, []);
-
-//   return (
-//     <Box p={3}>
-//       <Typography variant="h4">Form</Typography>
-//       <form onSubmit={handleSubmit} noValidate>
-//         <TextField
-//           label="Name"
-//           value={formData.name}
-//           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-//           error={!!errorMessages.name}
-//           helperText={errorMessages.name}
-//           required
-//           inputProps={{ maxLength: 30, minLength: 3 }}
-//         />
-//         <TextField
-//           label="Email"
-//           value={formData.email}
-//           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-//           error={!!errorMessages.email}
-//           helperText={errorMessages.email}
-//           required
-//         />
-//         <FormControl fullWidth>
-//           <InputLabel>Country</InputLabel>
-//           <Select
-//             value={formData.country}
-//             onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-//             required
-//           >
-//             <MenuItem value="USA">USA</MenuItem>
-//             <MenuItem value="Canada">Canada</MenuItem>
-//           </Select>
-//         </FormControl>
-//         <TextField
-//           label="Age"
-//           type="number"
-//           value={formData.age}
-//           onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-//           error={!!errorMessages.age}
-//           helperText={errorMessages.age}
-//           required
-//         />
-//         <TextField
-//           label="Address"
-//           multiline
-//           value={formData.address}
-//           onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-//           error={!!errorMessages.address}
-//           helperText={errorMessages.address}
-//           inputProps={{ maxLength: 250 }}
-//           required
-//         />
-//         <LocalizationProvider dateAdapter={AdapterDayjs}>
-//         <DatePicker
-//           label="Date of Birth"
-//           value={formData.dob}
-//           onChange={(dob) => setFormData({ ...formData, dob })}
-//         />
-//         </LocalizationProvider>
-//         <FormControl>
-//           <Typography>Gender</Typography>
-//           <RadioGroup
-//             value={formData.gender}
-//             onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-//           >
-//             <FormControlLabel value="male" control={<Radio />} label="Male" />
-//             <FormControlLabel value="female" control={<Radio />} label="Female" />
-//           </RadioGroup>
-//         </FormControl>
-//         <FormControlLabel
-//           control={
-//             <Checkbox
-//               checked={formData.isVegetarian}
-//               onChange={(e) => setFormData({ ...formData, isVegetarian: e.target.checked })}
-//             />
-//           }
-//           label="Vegetarian"
-//         />
-//         <Typography>Salary: {formData.salary}</Typography>
-//         <Slider
-//           value={formData.salary}
-//           onChange={(e, value) => setFormData({ ...formData, salary: value as number })}
-//           min={1000}
-//           max={10000}
-//         />
-//         <input
-//           type="file"
-//           accept="application/pdf"
-//           onChange={(e) => {
-//             const file:File = e.target.files?.[0];
-//             setFormData({ ...formData, file });
-//             setErrorMessages({ ...errorMessages, file: file && file.size > 2 * 1024 * 1024 ? 'File size must be less than 2 MB' : '' });
-//           }}
-//         />
-//         {errorMessages.file && <Typography color="error">{errorMessages.file}</Typography>}
-//         <Button type="submit" variant="contained" color="primary">Submit</Button>
-//       </form>
-
-//       <Typography variant="h5" mt={5}>Saved Data</Typography>
-//       <div style={{display: "inline-flex", margin: "20px 0", gridGap: "20px"}}>
-//         <Button onClick={exportToExcel} variant="outlined" color="primary">Export to Excel</Button>
-//         <Button onClick={handleDelete} variant="outlined" color="primary">Delete Records</Button>
-//         <Button onClick={downloadFileForSelectedRow} variant="outlined" color="secondary">Download File For Selected Row</Button>
-//       </div>
-      
-//       <DataGrid
-//         rows={rows.map((row, index) => ({ ...row, id: row.id }))}
-//         columns={[
-//           { field: 'id', headerName: 'ID', width: 70 },
-//           { field: 'name', headerName: 'Name', width: 150 },
-//           { field: 'email', headerName: 'Email', width: 200 },
-//           { field: 'country', headerName: 'Country', width: 120 },
-//           { field: 'age', headerName: 'Age', width: 80 },
-//           { field: 'address', headerName: 'Address', width: 250 },
-//           { field: 'dob', headerName: 'DOB', width: 120 },
-//           { field: 'gender', headerName: 'Gender', width: 100 },
-//           { field: 'isVegetarian', headerName: 'Vegetarian', width: 120 },
-//           { field: 'salary', headerName: 'Salary', width: 150 },
-//         ]}
-//         checkboxSelection
-//         rowSelectionModel={rowSelectionModel}
-//         onRowSelectionModelChange={(newRowSelectionModel: any) => setRowSelectionModel(newRowSelectionModel)}
-//       />
-
-//       {/* Snackbar for Toast Messages */}
-//       <Snackbar
-//         open={toast.open}
-//         autoHideDuration={3000}
-//         onClose={() => setToast({ open: false, message: '' })}
-//         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-//       >
-//         <Alert onClose={() => setToast({ open: false, message: '' })} severity="success">
-//           {toast.message}
-//         </Alert>
-//       </Snackbar>
-//     </Box>
-//   );
-// };
-
-// export default App;
