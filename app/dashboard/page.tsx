@@ -103,10 +103,7 @@ export default function App() {
   const [rowSelectionModel, setRowSelectionModel] =
     useState<GridRowSelectionModel>([]);
   const [errors, setErrors] = useState<{ [key in keyof FormData]?: string }>({});
-  const [toast, setToast] = useState<{ open: boolean; message: string }>({
-    open: false,
-    message: "",
-  });
+  const [fileUploadUrl, setFileUploadUrl] = useState('');
 
   // Validation function
   const validateForm = (): boolean => {
@@ -179,12 +176,27 @@ export default function App() {
     e.preventDefault();
     if (!validateForm()) return;
 
+    var newFormData: any;
+
     // Generate a unique ID for each new record
     const uniqueId = Date.now();
-    const newFormData = { ...formData, id: uniqueId };
 
+    // upload file to firebase storage
+    await uploadFile(formData.file)
+    .then(url => {
+      if (url) {
+        setFileUploadUrl(url);
+      }
+      console.log('\n\n =======  File uploaded successfully. Download URL  =======', url)
+    })
+    .catch(error => console.error('Error:', error));
+
+    newFormData = { ...formData, id: uniqueId, fileUrl: fileUploadUrl };
+    console.log("============= newFormData =====", newFormData)
+    
     setRows((prev) => [...prev, newFormData]);
-    // setIdCounter((prev) => prev + 1);
+
+    delete newFormData.file;  // delete file property from user object
 
     // Save to Firestore DB
     axios
@@ -198,14 +210,8 @@ export default function App() {
       });
 
 
-      uploadFile(formData.file)
-      .then(url => console.log('Download URL:', url))
-      .catch(error => console.error('Error:', error));
-
-      
     // // Fetch updated data and show toast
     // fetchFormData();
-    setToast({ open: true, message: "Form saved successfully!" });
 
     setInProgress(true)
     setMessage("User details added successfully!");
