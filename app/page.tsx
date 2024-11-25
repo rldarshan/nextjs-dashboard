@@ -32,10 +32,14 @@ const LoginPage = () => {
       (loaderRef.current.style.display as string | null) = 'block';
     }
 
-    console.log("Email:", email);
-    console.log("Password:", password);
+    
     // Add login logic here (API call)
     if (email == "rl.darshan01@gmail.com" && password == "test") {
+      const userObj:any = {"Email": email, "Password": password}
+      console.log(userObj);
+
+      userObj['displayName'] = 'User'
+      setUserData(userObj);
       router.push("/dashboard");
     } else {
       alert("Invalid Credentials");

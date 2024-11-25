@@ -6,6 +6,7 @@ import "../styles/global_styles.css";
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { uploadFile } from "../firebaseConfig";
+import { useRouter } from "next/navigation";
 
 import {
   Box,
@@ -31,6 +32,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DataGrid,GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 const API_URL = "https://api-7bjw3wubma-uc.a.run.app/"; 
 // const API_URL = "http://127.0.0.1:5001/myangularfirebase-74aff/us-central1/api";
@@ -51,11 +53,16 @@ export type FormData = {
 
 export default function App() {
   const { userData } = useAuth();
+  const router = useRouter();
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [inProgress, setInProgress] = useState(false);
 
   useEffect(() => {
+  if (!userData) {
+    router.push("/");
+    return;
+  }
   console.log("==== userData ==== ", userData);
 
   axios
@@ -248,14 +255,11 @@ export default function App() {
   return (
     <>
       <Header />
-      {userData ? (
-        <>
-          <br></br>{" "}
-          <img className="user-img" src={userData?.photoURL} alt="User_img" />{" "}
-        </>
-      ) : (
-        ""
-      )}
+      <>
+        <br></br>
+        { userData?.photoURL ? 
+        ( <img className="user-img" src={userData?.photoURL} alt="User_img" /> ) :
+        ( <AccountCircleIcon style={{ fontSize: 60 }} /> )}
 
       <br></br>
       <h1>Hi {userData?.displayName}, Welcome to Dashboard..!</h1>
@@ -507,6 +511,7 @@ export default function App() {
           </div>
         </>
       )}
+      </>
     </>
   );
 }
