@@ -5,6 +5,7 @@ import { useAuth } from "../auth_context";
 import "../styles/global_styles.css";
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
+import { uploadFile } from "../firebaseConfig";
 
 import {
   Box,
@@ -161,6 +162,14 @@ export default function App() {
       newErrors.gender = "Gender is required";
     }
 
+    if (!formData.file) {
+      valid = false;
+      newErrors.file = "A pdf file is required";
+    } else if (formData.file.size > 2 * 1024 * 1024) {
+      valid = false;
+      newErrors.file = 'File size must be less than 2 MB';
+    }
+
     setErrors(newErrors);
     return valid;
   };
@@ -189,6 +198,11 @@ export default function App() {
       });
 
 
+      uploadFile(formData.file)
+      .then(url => console.log('Download URL:', url))
+      .catch(error => console.error('Error:', error));
+
+      
     // // Fetch updated data and show toast
     // fetchFormData();
     setToast({ open: true, message: "Form saved successfully!" });
@@ -345,7 +359,7 @@ export default function App() {
           onChange={(e) => handleChange("file", e.target.files?.[0])}
           // setErrorMessages({ ...errorMessages, file: file && file.size > 2 * 1024 * 1024 ? 'File size must be less than 2 MB' : '' });
         />
-        {/* {errorMessages.file && <Typography color="error">{errorMessages.file}</Typography>} */}
+        {errors.file && <Typography color="error">{errors.file}</Typography>}
 
         <Box sx={{ display: "inline-flex", gridGap: "120px" }}>
           {/* Gender Field */}
