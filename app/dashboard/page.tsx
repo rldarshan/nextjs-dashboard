@@ -191,23 +191,23 @@ export default function App() {
     })
     .catch(error => console.error('Error:', error));
 
-    newFormData = { ...formData, id: uniqueId, fileUrl: fileUploadUrl };
-    console.log("============= newFormData =====", newFormData)
-    
-    setRows((prev) => [...prev, newFormData]);
+      newFormData = { ...formData, id: uniqueId, fileUrl: fileUploadUrl };
+      console.log("============= newFormData =====", newFormData)
+      
+      setRows((prev) => [...prev, newFormData]);
 
-    delete newFormData.file;  // delete file property from user object
+      delete newFormData.file;  // delete file property from user object
 
-    // Save to Firestore DB
-    axios
-      .post(`${API_URL}/add_user_data`, newFormData)
-      .then((response) => {
-        console.log("==== Firebase API add_user_data ==== ", response.data);
-        setMessage(response.data.message);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
+      // Save to Firestore DB
+      axios
+        .post(`${API_URL}/add_user_data`, newFormData)
+        .then((response) => {
+          console.log("==== Firebase API add_user_data ==== ", response.data);
+          setMessage(response.data.message);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
 
 
     // // Fetch updated data and show toast
@@ -344,17 +344,8 @@ export default function App() {
             label="Date of Birth"
             value={formData.dob}
             onChange={(date: any) => handleChange("dob", date)}
-            // renderInput={(params: null) => (
-            //   <TextField
-            //     {...params}
-            //     variant="outlined"
-            //     fullWidth
-            //     margin="normal"
-            //     error={!!errors.dob}
-            //     helperText={errors.dob}
-            //   />
-            // )}
           />
+          {errors.dob && <Typography color="error">{errors.dob}</Typography>}
         </LocalizationProvider>
 
         <input
