@@ -4,7 +4,7 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBdUd6j_UJcIPJKUlODxJrBgKeninMWopE",
+    apiKey: `${decrypt("FN\x7FfX~GiZi;odZOhNUOPZqTI}OwGlPjsnsR\\tuJ", 5)}`,  //  encrypted key
     authDomain: "myangularfirebase-74aff.firebaseapp.com",
     projectId: "myangularfirebase-74aff",
     storageBucket: "myangularfirebase-74aff.appspot.com",
@@ -12,6 +12,15 @@ const firebaseConfig = {
     appId: "1:431015899903:web:01fe0314456e33ec"
 };
 
+// Simple decryption function
+function decrypt(encryptedText: string, key: number) {
+    let decryptedText = '';
+    for (let i = 0; i < encryptedText.length; i++) {
+        const charCode = encryptedText.charCodeAt(i); // Get ASCII code of the character
+        decryptedText += String.fromCharCode(charCode - key); // Reverse the shift
+    }
+    return decryptedText;
+}
 
 // Initialize Firebase app
 const app = initializeApp(firebaseConfig);
