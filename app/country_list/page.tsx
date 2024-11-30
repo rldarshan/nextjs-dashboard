@@ -5,16 +5,17 @@ import React, { useState, useEffect } from 'react';
 
 export default function Country() {
  const [countries, setCountries] = useState([]);
+const API_URL = "https://api-7bjw3wubma-uc.a.run.app";
  
   useEffect(() => {
     async function fetchCountry() {
-      let res = await fetch('https://restcountries.com/v3.1/all')
+      let res = await fetch(`${API_URL}/get_country_list`)
       let data = await res.json()
-          const countryData = data.map((country: any) => ({
-            name: country.name.common,
-            flag: country.flags.svg,
-          }));
-          setCountries(countryData);
+      const countryData = data.map((country: any) => ({
+        name: country.name.common,
+        flag: country.flags.svg,
+      }));
+      setCountries(countryData);
     }
     fetchCountry()
   }, [])
