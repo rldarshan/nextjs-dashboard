@@ -7,6 +7,10 @@ body {
   border-radius: 50%;
 }
 
+.nav-link, .navbar-brand {
+  color: white;
+}
+
 @media (min-width: 992px) {
   .collapse .collapse-content {
     display: flex;

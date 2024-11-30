@@ -21,9 +21,7 @@ const LoginPage = () => {
   const formRef = useRef<HTMLInputElement | null>(null);
   const loaderRef = useRef<HTMLInputElement | null>(null);
 
-  const handleLogin = (e: any) => {
-    e.preventDefault();
-    
+  function loader() {
     if (formRef.current) { 
       (formRef.current.style.opacity as string | null) = '0.5';
     }
@@ -31,10 +29,14 @@ const LoginPage = () => {
     if (loaderRef.current) { 
       (loaderRef.current.style.display as string | null) = 'block';
     }
-
-    
+  }
+  
+  const handleLogin = (e: any) => {
+    e.preventDefault();
+   
     // Add login logic here (API call)
     if (email == "rl.darshan01@gmail.com" && password == "test") {
+      loader();
       const userObj:any = {"Email": email, "Password": password}
       console.log(userObj);
 
@@ -82,7 +84,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="container">
+    <div className="login-container">
       <div id="loader-wrapper">
         <div id="loader" ref={loaderRef}></div>
       </div>

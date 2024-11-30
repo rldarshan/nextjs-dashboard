@@ -1,80 +1,31 @@
-import "mdb-react-ui-kit/dist/css/mdb.min.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
-import React, { useState } from "react";
-import {
-  MDBContainer,
-  MDBNavbar,
-  MDBNavbarBrand,
-  MDBNavbarToggler,
-  MDBIcon,
-  MDBNavbarNav,
-  MDBNavbarItem,
-  MDBNavbarLink,
-  MDBBtn,
-  MDBDropdown,
-  MDBDropdownToggle,
-  MDBDropdownMenu,
-  MDBDropdownItem,
-  MDBCollapse,
-} from "mdb-react-ui-kit";
+import { Navbar, Container, Nav, Row, Spinner } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './styles/global_styles.css';
+import Image from 'next/image';
+import brandLogo from './assets/react_firebase.png';
 
 export default function Header() {
-  const [openBasic, setOpenBasic] = useState(false);
-
   return (
-    <>
-      <link
-        href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-        rel="stylesheet"
-      />
-
-      <MDBNavbar expand="lg" light bgColor="light">
-        <MDBContainer fluid>
-          <MDBNavbarBrand href="#">Brand</MDBNavbarBrand>
-
-          <MDBNavbarToggler
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-            onClick={() => setOpenBasic(!openBasic)}
-          >
-            <MDBIcon icon="bars" fas />
-          </MDBNavbarToggler>
-
-          <MDBCollapse navbar open={openBasic} className="d-flex">
-            <MDBNavbarNav className="my-2, my-lg-0, me-sm-0, my-sm-0">
-              
-              <MDBNavbarItem>
-                <MDBNavbarLink aria-current="page" href="/">
-                  Login Page
-                </MDBNavbarLink>
-              </MDBNavbarItem>
-
-              <MDBNavbarItem>
-                <MDBNavbarLink href="/about">About</MDBNavbarLink>
-              </MDBNavbarItem>
-
-              <MDBNavbarItem>
-                <MDBNavbarLink href="/dashboard">Dashboard</MDBNavbarLink>
-              </MDBNavbarItem>
-
-              <MDBNavbarItem>
-                <MDBNavbarLink href="country_list"> Country Table </MDBNavbarLink>
-              </MDBNavbarItem>
-            </MDBNavbarNav>
-            
-            <form className="d-flex input-group w-auto">
-              <input
-                type="search"
-                className="form-control"
-                placeholder="Type query"
-                aria-label="Search"
-              />
-              <MDBBtn color="primary">Search</MDBBtn>
-            </form>
-          </MDBCollapse>
-        </MDBContainer>
-      </MDBNavbar>
-    </>
+    <Navbar bg="primary" data-bs-theme="light" collapseOnSelect expand="lg">
+      <Container>
+        <Navbar.Brand href="#" onClick={(event) => {event.preventDefault();}}>
+          <Image src={brandLogo} alt='Navbar' width={150} height={40} quality={80} />
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+        <Navbar.Collapse id="responsive-navbar-nav">
+          <Nav className="me-auto">
+            <Nav.Link href="/dashboard">Dashboard</Nav.Link>
+            <Nav.Link href="/about">About</Nav.Link>
+            <Nav.Link href="/country_list">Country Table</Nav.Link>
+          </Nav>
+          <Nav>
+            <Nav.Link href="/logout">Logout</Nav.Link>
+            {/* <Nav.Link eventKey={2} href="#memes">
+              Dank memes
+            </Nav.Link> */}
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 }

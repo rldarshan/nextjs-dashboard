@@ -10,6 +10,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <link rel="icon" type="image/png" sizes="32x32" href="./assets/react-firebase-favicon.png" />
       <body>
         <AuthProvider>{children}</AuthProvider>
       </body>
