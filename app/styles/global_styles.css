@@ -3,15 +3,16 @@ body {
   font-family: Roboto, Helvetica, Arial, sans-serif;
 }
 
-.user-img{
+.user-img {
   border-radius: 50%;
 }
 
-.nav-link, .navbar-brand {
-  color: white;
+.nav-link,
+.navbar-brand {
+  color: white !important;
 }
 
-.nav-link .active {
+.nav-link.active {
   border: 2px dotted white;
 }
 
