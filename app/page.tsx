@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import "./styles/login_styles.css";
+import "./styles/login_styles.scss";
 import { auth } from "./firebaseConfig";
 import {
   getAuth,

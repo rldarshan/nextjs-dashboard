@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Navbar, Container, Nav, Row, Spinner } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './styles/global_styles.css';
+import 'bootstrap/dist/css/bootstrap.min.scss';
+import './styles/global_styles.scss';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import brandLogo from './assets/react_firebase.png';
@@ -14,7 +14,7 @@ export default function Header() {
 
   useEffect(() => {
       const page = document.location.pathname.split('/')[1];
-      console.log("==== url ==",page)
+
       if (page == 'country_list') {
         setActiveKey(3)
       } else if (page == 'about') {

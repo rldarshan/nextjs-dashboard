@@ -2,7 +2,7 @@
 
 import Header from "../header";
 import { useAuth } from "../auth_context";
-import "../styles/global_styles.css";
+import "../styles/global_styles.scss";
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { uploadFile } from "../firebaseConfig";

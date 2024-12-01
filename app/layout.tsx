@@ -1,6 +1,6 @@
 "use client";
 import Head from 'next/head';
-import "./styles/global_styles.css";
+import "./styles/global_styles.scss";
 import { AuthProvider } from "./auth_context";
 import favicon from "./assets/react-firebase-favicon.png";
 

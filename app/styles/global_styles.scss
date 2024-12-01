@@ -35,6 +35,11 @@ body {
 
 .country-table {
   width: -webkit-fill-available;
+
+  thead {
+    border-bottom: 1px solid black;
+    background-color: antiquewhite;
+  }
 }
 
 @media (min-width: 992px) {
