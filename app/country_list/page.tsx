@@ -25,9 +25,9 @@ const API_URL = "https://api-7bjw3wubma-uc.a.run.app";
       <Header />
       <br></br>
       
-      <div className="App">
+      <div className="m-4">
         <h1>Country List</h1>
-        <table border={1} style={{ width: '100%', textAlign: 'left'}}>
+        <table border={1} className="country-table">
           <thead>
             <tr>
               <th>Name</th>
