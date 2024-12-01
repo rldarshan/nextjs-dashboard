@@ -59,13 +59,13 @@ export default function App() {
   const [inProgress, setInProgress] = useState(false);
 
   useEffect(() => {
-  if (!userData) {
-    router.push("/");
-    return;
-  }
-  console.log("==== userData ==== ", userData);
+    if (!userData) {
+      router.push("/");
+      return;
+    }
+    console.log("==== userData ==== ", userData);
 
-  axios
+    axios
       .get(`${API_URL}/get_all_users`)
       .then((response) => {
         console.log("==== Firebase API 'get_all_users' Data ==== ", response.data);
@@ -264,10 +264,8 @@ export default function App() {
       <br></br>
       <h1>Hi {userData?.displayName}, Welcome to Dashboard..!</h1>
 
-      <form
-        onSubmit={handleSubmit}
-        style={{ maxWidth: "600px", margin: "auto", padding: "0 20px" }}
-      >
+      <form className="dashboard-form"
+        onSubmit={handleSubmit}>
         <Typography variant="h4" gutterBottom>
           Registration Form
         </Typography>
@@ -342,6 +340,7 @@ export default function App() {
           helperText={errors.address}
         />
 
+      <div className="d-flex gap-2">
         {/* Date of Birth Field */}
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
@@ -355,12 +354,12 @@ export default function App() {
         <input
           type="file"
           ref={inputRef}
-          style={{ margin: "15px" }}
           accept="application/pdf"
           onChange={(e) => handleChange("file", e.target.files?.[0])}
           // setErrorMessages({ ...errorMessages, file: file && file.size > 2 * 1024 * 1024 ? 'File size must be less than 2 MB' : '' });
         />
         {errors.file && <Typography color="error">{errors.file}</Typography>}
+        </div>
 
         <Box sx={{ display: "inline-flex", gridGap: "120px" }}>
           {/* Gender Field */}
@@ -460,9 +459,7 @@ export default function App() {
         <>
           <br></br>
 
-          <div
-            style={{ width: "100%", margin: "auto", padding: "0 20px" }}
-          >
+          <div className="user-table">
             <DataGrid
               rows={rows}
               columns={columns}
