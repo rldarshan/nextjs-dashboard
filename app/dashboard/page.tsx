@@ -7,6 +7,7 @@ import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { uploadFile } from "../firebaseConfig";
 import { useRouter } from "next/navigation";
+import Image from 'next/image';
 
 import {
   Box,
@@ -258,7 +259,8 @@ export default function App() {
       <>
         <br></br>
         { userData?.photoURL ? 
-        ( <img className="user-img" src={userData?.photoURL} alt="User_img" /> ) :
+        ( <Image className="user-img" src={userData?.photoURL} 
+          width={150} height={130} alt="User_img" quality={100} /> ) :
         ( <AccountCircleIcon style={{ fontSize: 60 }} /> )}
 
       <br></br>
