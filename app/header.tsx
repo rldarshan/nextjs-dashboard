@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Navbar, Container, Nav, Row, Spinner } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.scss';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/global_styles.scss';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
