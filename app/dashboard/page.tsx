@@ -249,6 +249,16 @@ export default function App() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
   
+  const handleDelete = async () => {
+    const idsToDelete = rowSelectionModel.map((id) => Number(id));
+    // await deleteFormData(idsToDelete);
+    setInProgress(true)
+    setMessage("Records deleted succefully.")
+    setTimeout(()=> setInProgress(false),3000)
+    setRows((prevRows) => prevRows.filter((row) => !idsToDelete.includes(row.id)));
+    setRowSelectionModel([]);
+  };
+
   function SlideTransition(props: SlideProps) {
     return <Slide {...props} direction="up" />;
   }
@@ -346,6 +356,7 @@ export default function App() {
         {/* Date of Birth Field */}
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
+           className="w-50"
             label="Date of Birth"
             value={formData.dob}
             onChange={(date: any) => handleChange("dob", date)}
@@ -355,6 +366,7 @@ export default function App() {
 
         <input
           type="file"
+          className="w-50"
           ref={inputRef}
           accept="application/pdf"
           onChange={(e) => handleChange("file", e.target.files?.[0])}
@@ -477,15 +489,15 @@ export default function App() {
               // loading={loading}
             />
 
-            {/* <div style={{ display: "grid" }}>
-              <Button
+            <div className="table-btn-group">
+              {/* <Button
                 variant="contained"
                 color="primary"
                 onClick={handleExport}
                 style={{ marginTop: "10px", height: "30px" }}
               >
                 Export to Excel
-              </Button>
+              </Button> */}
 
               <Button
                 variant="contained"
@@ -497,7 +509,7 @@ export default function App() {
                 Delete Selected
               </Button>
 
-              <Button
+              {/* <Button
                 variant="contained"
                 // color="Primary"
                 onClick={downloadFileForSelectedRow}
@@ -505,8 +517,8 @@ export default function App() {
                 disabled={rowSelectionModel.length === 0}
               >
                 Download File
-              </Button>
-            </div> */}
+              </Button> */}
+            </div>
           </div>
         </>
       )}

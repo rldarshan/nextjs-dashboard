@@ -42,6 +42,13 @@ body {
   }
 }
 
+.table-btn-group {
+  display: grid;
+  margin: auto; 
+  width: 200px;
+  padding: 40px 0;
+}
+
 @media (min-width: 992px) {
   .collapse .collapse-content {
     display: flex;

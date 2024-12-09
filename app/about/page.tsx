@@ -533,7 +533,7 @@ export default function FormComponent() {
               // loading={loading}
             />
 
-            <div style={{display: "grid", margin: "auto", width: "200px" }}>
+            <div className="table-btn-group">
               <Button
                 variant="contained"
                 color="primary"
