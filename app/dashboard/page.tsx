@@ -58,6 +58,10 @@ export default function App() {
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [inProgress, setInProgress] = useState(false);
+  const [rows, setRows] = useState<any[]>([]);
+  const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>([]);
+  const [errors, setErrors] = useState<{ [key in keyof FormData]?: string }>({});
+  const [fileUploadUrl, setFileUploadUrl] = useState('');
 
   useEffect(() => {
     if (!userData) {
@@ -65,7 +69,7 @@ export default function App() {
       return;
     }
     console.log("==== userData ==== ", userData);
-
+    
     axios
       .get(`${API_URL}/get_all_users`)
       .then((response) => {
@@ -106,12 +110,6 @@ export default function App() {
     { field: 'salary', headerName: 'Salary', width: 50, type: 'number' },
     { field: 'file', headerName: 'File', width: 150 },
   ];
-
-  const [rows, setRows] = useState<any[]>([]);
-  const [rowSelectionModel, setRowSelectionModel] =
-    useState<GridRowSelectionModel>([]);
-  const [errors, setErrors] = useState<{ [key in keyof FormData]?: string }>({});
-  const [fileUploadUrl, setFileUploadUrl] = useState('');
 
   // Validation function
   const validateForm = (): boolean => {
@@ -248,10 +246,20 @@ export default function App() {
   const handleChange = (field: keyof FormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
-  
+
   const handleDelete = async () => {
     const idsToDelete = rowSelectionModel.map((id) => Number(id));
-    // await deleteFormData(idsToDelete);
+    console.log(idsToDelete)
+    axios
+        .delete(`${API_URL}/delete_user_data/${idsToDelete}`)
+        .then((response) => {
+          console.log("==== Firebase API add_user_data ==== ", response.data);
+          setMessage(response.data.message);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
+
     setInProgress(true)
     setMessage("Records deleted succefully.")
     setTimeout(()=> setInProgress(false),3000)
@@ -268,13 +276,15 @@ export default function App() {
       <Header />
       <>
         <br></br>
+        <div className="text-center">
         { userData?.photoURL ? 
         ( <Image className="user-img" src={userData?.photoURL} 
           width={150} height={130} alt="User_img" quality={100} /> ) :
         ( <AccountCircleIcon style={{ fontSize: 60 }} /> )}
+        </div>
 
       <br></br>
-      <h1>Hi {userData?.displayName}, Welcome to Dashboard..!</h1>
+      <h1 className="text-center">Hi {userData?.displayName}, Welcome to Dashboard..!</h1>
 
       <form className="dashboard-form"
         onSubmit={handleSubmit}>
@@ -317,7 +327,7 @@ export default function App() {
               Select Country
             </MenuItem>
             <MenuItem value="USA">USA</MenuItem>
-            <MenuItem value="Canada">Canada</MenuItem>
+            <MenuItem value="India">India</MenuItem>
             <MenuItem value="UK">UK</MenuItem>
             {/* Add more countries as needed */}
           </Select>
