@@ -64,10 +64,10 @@ export default function App() {
   const [fileUploadUrl, setFileUploadUrl] = useState('');
 
   useEffect(() => {
-    if (!userData) {
-      router.push("/");
-      return;
-    }
+    // if (!userData) {
+    //   router.push("/");
+    //   return;
+    // }
     console.log("==== userData ==== ", userData);
     
     axios

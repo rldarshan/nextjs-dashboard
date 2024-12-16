@@ -60,9 +60,10 @@ export default function Country() {
       
       <div className="m-4">
         <h1>Country List</h1>
-        {loading && <p>Loading...</p>}
-        {error && <p>Error: {error}</p>}
+        {loading && <h1>Loading...</h1>}
+        {error && <h2>Error: {error}</h2>}
 
+        {countries && 
         <table border={1} className="country-table">
           <thead>
             <tr>
@@ -80,7 +81,7 @@ export default function Country() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table>}
       </div>
     </>
   );
