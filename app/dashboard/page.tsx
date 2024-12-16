@@ -35,9 +35,6 @@ import { DataGrid,GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-const API_URL = "https://api-7bjw3wubma-uc.a.run.app/"; 
-// const API_URL = "http://127.0.0.1:5001/myangularfirebase-74aff/us-central1/api";
-
 export type FormData = {
   id: number;
   name: string;
@@ -71,7 +68,7 @@ export default function App() {
     console.log("==== userData ==== ", userData);
     
     axios
-      .get(`${API_URL}/get_all_users`)
+      .get(`${process.env.API_URL}/get_all_users`)
       .then((response) => {
         console.log("==== Firebase API 'get_all_users' Data ==== ", response.data);
         setRows(response.data);
@@ -206,7 +203,7 @@ export default function App() {
 
       // Save to Firestore DB
       axios
-        .post(`${API_URL}/add_user_data`, newFormData)
+        .post(`${process.env.API_URL}/add_user_data`, newFormData)
         .then((response) => {
           console.log("==== Firebase API add_user_data ==== ", response.data);
           setMessage(response.data.message);
@@ -251,7 +248,7 @@ export default function App() {
     const idsToDelete = rowSelectionModel.map((id) => Number(id));
     console.log(idsToDelete)
     axios
-        .delete(`${API_URL}/delete_user_data/${idsToDelete}`)
+        .delete(`${process.env.API_URL}/delete_user_data/${idsToDelete}`)
         .then((response) => {
           console.log("==== Firebase API add_user_data ==== ", response.data);
           setMessage(response.data.message);

@@ -11,8 +11,7 @@ type Country = {
 
 export default function Country() {
   const [countries, setCountries] = useState<Country[]>([]);
-  const API_URL = "https://api-7bjw3wubma-uc.a.run.app";
-  const { data, error, loading, fetchData } = useFetch<Country[]>(`${API_URL}/get_country_list`);
+  const { data, error, loading, fetchData } = useFetch<Country[]>(`${process.env.API_URL}/get_country_list`);
 
    // Fetch countries on initial mount
    useEffect(() => {
